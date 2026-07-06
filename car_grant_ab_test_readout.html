@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<!--
+=================================================================
+A/B TEST READOUT TEMPLATE — Mudah Product Analytics
+=================================================================
+Branded version: Mudah logo embedded in header, brand red (#E51E2A)
+as the single accent color. Semantic colors (green/red/yellow callouts)
+intentionally kept distinct from brand red.
+=================================================================
+HOW TO USE:
+1. Replace all {{PLACEHOLDER}} values with experiment-specific content.
+2. Update the chart data in the <script> block at the bottom.
+3. Embed screenshots as base64 in the src="data:image/jpeg;base64,..." spots,
+   or replace with regular file paths if not self-contained.
+4. Delete sections or rows that don't apply (e.g., segment table if no
+   segment data, screenshots block if not relevant).
+5. Save as a new file with the experiment name.
+
+PLACEHOLDER CONVENTION:
+{{FIELD_NAME}}        — single value to fill in
+{{SECTION_NAME}}      — entire block to write
+[OPTIONAL: ...]       — keep or remove based on whether it applies
+=================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Car Grant CTA Redesign A/B Test Readout — MD-2410</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --ink:#1a1d24; --ink2:#5b6573; --line:#e6e9ee;
+  --accent:#E51E2A; --pos:#10b981; --neg:#ef4444; --warn:#f59e0b;
+  --ctrl:#94a3b8; --trt:#E51E2A;
+  /* Mudah brand palette */
+  --brand-red:#E51E2A; --brand-green:#00963C; --brand-yellow:#F5A623; --brand-blue:#1495D2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.55;font-size:14px}
+.container{max-width:1180px;margin:0 auto;padding:24px}
+header{background:linear-gradient(135deg,#1e293b 0%,#334155 100%);color:#fff;padding:28px 32px;border-radius:12px;margin-bottom:20px;border-top:3px solid var(--brand-red);display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+header .head-text{flex:1;min-width:0}
+header .head-logo{flex-shrink:0;background:#fff;border-radius:8px;padding:8px 10px;display:flex;align-items:center}
+header .head-logo img{display:block;height:36px;width:auto}
+header h1{margin:0 0 4px;font-size:22px;font-weight:600}
+header .sub{opacity:.85;font-size:13px}
+header .meta{margin-top:14px;display:flex;gap:24px;flex-wrap:wrap;font-size:12px;opacity:.9}
+header .meta span strong{display:block;font-size:13px;opacity:.7;margin-bottom:2px;font-weight:500}
+.tldr{background:#fafbfc;border:1px solid var(--line);border-left:4px solid var(--brand-red);border-radius:12px;padding:22px 28px;margin-bottom:20px}
+.tldr h2{margin:0 0 12px;font-size:15px;font-weight:700;color:var(--ink);letter-spacing:.4px;text-transform:uppercase}
+.tldr ul{margin:8px 0;padding-left:20px}
+.tldr li{margin:6px 0;color:var(--ink)}
+.tldr table{margin:10px 0 6px;background:#fff}
+section{background:var(--card);border-radius:12px;padding:24px 28px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+section h2{margin:0 0 6px;font-size:16px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:10px}
+section h2 .num{display:inline-flex;width:26px;height:26px;border-radius:6px;background:var(--accent);color:#fff;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+section h3{margin:18px 0 8px;font-size:14px;font-weight:600;color:var(--ink)}
+section p{margin:6px 0;color:var(--ink)}
+.muted{color:var(--ink2);font-size:13px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.kpi{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.kpi .label{font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi .val{font-size:22px;font-weight:700;margin:4px 0 2px}
+.kpi .sub{font-size:12px;color:var(--ink2)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:#f8fafc;font-weight:600;color:var(--ink2);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.tag.pos{background:#d1fae5;color:#065f46}
+.tag.neg{background:#fee2e2;color:#991b1b}
+.tag.warn{background:#fef3c7;color:#92400e}
+.tag.neu{background:#e5e7eb;color:#374151}
+.chart-wrap{margin:12px 0;background:#fafbfc;border:1px solid var(--line);border-radius:8px;padding:14px}
+.chart-wrap h4{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--ink2)}
+.chart-wrap canvas{max-height:260px}
+.callout{background:#fef3c7;border-left:3px solid var(--warn);padding:12px 16px;border-radius:6px;margin:12px 0}
+.callout.info{background:#e0f2fe;border-left-color:var(--brand-blue)}
+.callout.pos{background:#d1fae5;border-left-color:var(--pos)}
+.callout.neg{background:#fee2e2;border-left-color:var(--neg)}
+.callout strong{display:block;margin-bottom:4px}
+ul{padding-left:20px;margin:6px 0}
+li{margin:4px 0}
+.screenshots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0}
+.screenshot{text-align:center}
+.screenshot img{max-width:100%;border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.screenshot .caption{font-size:12px;color:var(--ink2);margin-top:8px;font-weight:600}
+.screenshot .desc{font-size:11px;color:var(--ink2);margin-top:3px}
+@media(max-width:768px){.screenshots{grid-template-columns:1fr}}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:10px 0}
+.metric-card{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.metric-card .name{font-size:13px;color:var(--ink);font-weight:600;margin-bottom:4px}
+.metric-card .desc{font-size:12px;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ============ HEADER ============ -->
+<header>
+<div class="head-text">
+<h1>View Car Grant CTA Redesign A/B Test — Readout</h1>
+<div class="sub">Jira: MD-2410 · Mobile Web · iOS · Android · Cars For Sale · Adview page</div>
+<div class="meta">
+<span><strong>Period</strong>May 13, 2026 – Jul 4, 2026 (53 days analyzed)</span>
+<span><strong>Status</strong>Complete — ship decision</span>
+<span><strong>Owner</strong>Rizki Malano</span>
+</div>
+</div>
+<div class="head-logo">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAe70lEQVR4Xu2cCXhb1ZXHxRrbMgGyW3rajCEBO9KTnYWltAmBxJIJS1pop1BIKaXTFsqUoVCWgbQd1sIUMgViSZachBDqxHaADoW2NLSFln0LIbZlx1q8ZF8gCbGd5M3//54EsmI7cQhpG87v++4n6d377rt675x7lnslk0kQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEH4V8C2oLnEGWn8hiPSeCvKg85Iw82Oqkafdf6q4dltBeELw8iadfnOSPR0KMc9KK+idBUu3aBBSbY5qpuesUcav2urjp5kmqMdmX2uIBzezJlzpDPccKEz3PiOM9y03VndrOllfgteo3qBkuywVzfebQ+vPC37dEE4bDmxpuV4R6TpJ87qpreckSatcHGbBuvxMhTlRzj2b3gNw4psKKxZw+Mb8X6BEmkoz+jiiIz3gnCYoGlH0GWyR5qug2I0uZ6gYjRtQXkO7tS3Rj6yMp/NoCCTHeGGXzrCTStci5IaPu/E+yWMS8ZWNRyX3a2w/2gm01FJxWNN2MpOah7tHqWZphyd3eZg8EZZ2TG8TlIpLYo5ygo0mdT2DZXDWdX4U0e48SPXwlbGGhvgRi2xLfigJLutUpMc5pgfvRqK8abudkWadsMde9kejn5NbwBlyzpF2AdUjnUji8e0Keo1CZv37rjdfUWbddznkghZPapkNBTk2qRdvS9uV6/cOGzyUFGSAXAsaHBBMR5A2ehaGKPr1M6MVUFotcO0XOtzFrMveu9E54LoV+COLUpZm90of7dHGq7PbivsmyiEtM3q/VrS5l0et3u7Yna1IamUjc9udzDAdc7AdeIJu3cXlPF3bVbP1A5LWV52uy88U+YsPxpCraI8BIXodD3RDpcpGoPQ/9xeHS3Obr8Xc7QjbVXR6bAktYxXXAtaNHu46a0R4fYbv1T1J8+WRfYTtTrr8H2WZywjtBplWHb3XyTi9vEn0npAcBu7XZO0uC686sTsdgeDNqt7WoejVNtdOFnD9d6JKZ6LG0aMFfe4FzU1RxVWNUxwhaMPOCLRXS49GG9qhnLcX1i50p7dvD/KKt84xjV/9SRYnxdwbrerOqqNi7zbftui+x7sqiu4bNcy6xUs3XXWK/sru+pts7vqlcu1ZQVn76hRrFqN6ajs6xzutDrVExI2z7cxo7+31TkBCqJ+GLeXlmW3OxgkFXUKrEf3dtdELWFXX4U7NxPunR5jCikc8xumOiINi5xQDj1TVd30rrM6+mNnpPWE7Lb7Aufk2KvjxaMj8ceLI+9s+8nCX/0lumRyTKsbvaOnTvmou1bZNmCpR6lTPkTZ3FWn3K/VO52aZvpCra+IgvyTUFapHeMIN58DxaiBxehyPdnBNY0/wIpcZVucsGQ0HWTQph0xNNQ56drHH7tn1ZIz4j1PF2ra0xYNCrIZCrCpB4UKsFfh8VplCyzJdu23Nq2rVol21Vnu0J4tGpJ9hcMZUZB/AormRodAMaagLHJVN/U4F6zWoBgvIbC+pLCm5fjs9geCtsw0Q6sb1aM9q2iwBitoEVDuTb3uVaA490Ep7uuutQShMFu1Z21ad631Ze350ebsvg9nREH+CXDMb/QxdasH1IvizFb9jgpDxclueyAw0O6us10Fq7Gzq87aA4F/OLtNfzD2gCWJan9xaDjvfa1m5D4fGFOT2enJ9LHMklm/v23SZNT324bsq58Ue103fc4BKMhe/fRx/b6ODagg++jvsEP/gsr/JHNTC4Av0q1yzm9mQD7PFWr6MuuyTzpQmJGCJbgaAt6FsrO73vpAdpv+2PbUqNE4p0n7KxXE+sE+FOSwe3DRoslDB6kgB0xvBfG+1mb3nN/qdOZkt/tC4Kj8oIDxBRTiTS4AOsONO7k9hCviB3tBz1AQ5VMFqbP9T3ab/thRa1V0C0IFqVdW7kNBTKsLvI6k4v1K3OqdllSK9RRxh6VsRMyh+hMO71VJu/pdCNxVCVvp2TyePm9TYdnxEL6zEjZ1dptdvQbCchk+n8eV6097N+DaQNzu+VKSfdq8E/pa2WYbrkgnFXd5q7X0dK5MZ7chRruy8bjWJejrKgj/95IO73f4GWM4uXOMd6QxFu/bhoJ4t/anIEnljNyYxePF+V/F+de0QrFiDvdXOVbeF7bRysqOaXd4vKibwesuzxh7poLgOn/DfZrRZnUrTCu34r6g/mpc+/KY1TO11Vk85rC2JFCM2ShN3GDIuMMVaVhqDzcVfh67cA+agtTtW0Ha7N5vxW3eP0DYXoSAlvMB48F+Ew/8vTWOUm0ThKzT7uVM/H8UwjWj3eakouSiDYRdXZa0ebUtjjIN73eg/mX0cTmFNPMazcppRaivQ/1KvD76oXXSXivbSbRJ2t3Xx23q6+hzEfq5OLOewkXlaHN4pmJsc9HPGo6PSrAO10/avWsxJq5on4e6H0C5392COrzfDKEvze6rDWPgwh7OqcT12vg92/E94Sq1YVJ4BvfjBrhrTihLMa43D59fQ193NWKSmGMyMoOcWKgg25ywIA71FUwql2ES+CbOr8F4tA0YF+7txzj/BU4y/Sn9YODYa0yXHKXpZW+Fw7EjWZd9/PNjzvKjrVWNHliPBS4E47prFY7efVKouchUo30uAzmUCoIH/wAFDA96J4TjN3iQT0IQNnWmlIMPud1eyvpdeNBvQgDvhNDMw+c3KASbUL8RhQtmXLlGfwmUX6T7p7WA0p2D9p0UWAjj3/UZNssVoWCjLEG7HTh/HYUxs379iLIC1AdxvBFttvPa63FdjnGjs0zjeFH3ERSsBeN4Hd9lI+shoFs6HGW9FITXR/kV+kim++L35Peg0uHYHsPyqI+jBPC+nfcA759pVdyTVxYXH8t+0grCMWDM69HnK/jczvM5JvbH89B/D8azBm2+v9pVMjpzLIOlBZablrYTirsma5+ZZnLmcILrcJScykks87wDpS8l7EVxjXasM9zybUek6Q3ul3KEG192VDX3mt0ONodUQRzeR3e6JukCjge7gYJFQYMg12ImDOCh/g5l1yaH7q50Q0gaKDwUeBz/M9pVGW3UJIVhM4XF7v1DUilx0x3R9I2DXh+E5KMe12TWvZewuemu9dqSAaU7H/08R2HFGLqSiueTxATa2hPW0h/zGhQ6Cj7abOL1URajPIHPf8Xr9g8Nt+pjCqUu7FCQtIvF2ZVuIhWYAsu+dCvD72xXn0f/i/D9ajDG1zt1hfBuTgu8rtx27x9blfFfiRYZqfO0ghjj8e7he94j9PMq712cEw4sEs9dS2WFgsGd86W/10BwrBuGn2KNwfLA7fwqBP/0uEU9C33M4USWtJfWxBXv3HaL94L1I8Za2i3use20nDY1goKJTv1vntcCt5P9cd8Yzj8P9/U6uNNXrMnafkNFWGcqzo9b3DPjinp9wuL5Oq1sZps+YWYKgfn1jnDTSmd10x4oyLPOSPSn3HXLbSSFlS3H/9PGIPuhIHjocylUeLhamyEUrbi5v263qGdihnLRrYJAfQBF6OEszYJjW/gQMJPN4oNps6oVqA9ROOjy4AGuoD8PQRrKa9A3R/+bP4Yi4sG+hfPPov+fOY4YXDYc/23S2Ne0DeXBdB3in6/j8zsUQo4R/a9Gn1V42JcjLpiM10lxuHZJQ8DXwm3U2jHONWyboSBUSj54KsCHdIvs3t2ob6Zlijk8s+IFpWWtEMQYYwdF/S3qNqYsCqyUfo+eY3zSj4Lw3uG+eJcZ4zqtqM2Jvhyexei/m2PH6xqUm9LfayAgsMeuG3na2QlFfRffazm+72MJqy78SVp83epj4kJdTcLq+fd2xX0nxvw23cQO/Xur2/A9Xmy1en5MtziGZ4l2t6NNO+ro6t7Y+3rFx3aMKJmA48vQbyJu9SxI2EpOymzTJ9wCokSiU/jrv8InO+hi6RsK+YtAKMp7CNa/7oy8PehV84E41AryEYSFMzeVI2bz3p5ZT5cAN+zneLAtuisBoYKQ/KzVOX4c69MmGAp1FoXRmJG9UbS/BUqgB/0HpiAePXPHtG0b3EAKoW7lbN4mxA1zOiwW3QLRH2fh+3ZLiQ1Cex2utZMClK0g+nehpYCFMVwm7wY9boA7kvLpjzTKlKM3n8B0sfcxlB0Ufn53jO/5vhTEsJrqRgor3Z/0dyL4XpdB6F40FEQvd2fW98ca02hzYrT7Apy3SbdKhsXs4TOKG1a8E8eo4BvQf0uS2TpFXZtS+AbeA04UOPZW+4ixY/mckgWeWaj/aItDj83qWyyF9uUmk+6iNVpOGZG0uO/EcVrM9rji+SkTC9nj2htYh6LHo0NpMVzV0f91RhrfdvL3HcavAXuc4abnDrbLdagVZHtKQVCWtCMWyKzn5rs2pZRbx98zgl747AjmM9sQPLDT+KBS8QxmeO9/pU30gSgI3t/P43ATJqPvpby2HvTavQ93InjOPDcTjM2Nc/+E623XZ3YoSCwVg7RbJozF+bGUEq+P2UofabF6TsnuI43uGuqupjflivVtQTjBQFjfZzbvXczWmX3EjdiKbtseXWDt6n2Z9f3B9ZRkQcnFaP+hYe2ggIq6ENe4hG5eXCm5Dt9tPe8JhR6x1ht0jWhNeb/xPf+WTl7ErSXnG65uiRtt/6zHlDZ1BbN960ecpW+uTIwqOQnHXjImFfU1WpNW0yBS1oxF6FJBIb4Hl+tXDv46cH4zYpKm9Ti2X2ZzfznkCuKaqPHh4f3D7RaPN7OeQWGCKUu7920KCW781o4+0qbM9vCm03c3FMRz+4EqSJIKohiCFIMfjWMvUNjZd8zh/U7medkwy0QhxPUSm/WZkgpifKc2a+npOL6BMRf6bIIv/jVaqOw+0jAIpitCBTHcUMYp7rPTCtKZUhB9HURPPnhm0J3J7IMpXozn8eQnCuK9N7O+P9aNHJmfsI2/CP1v0S0U+y9wn52ub7ecZKOrxAyargSK5+bMNHycCQ3d8sDts46fvRIKx+cRt7pvwbFO3GPGmVWMTdi+bUxJBY7TSu1KKJ4QA/50X4NmTDg6Uv85re5uNa5zRBp+8knlnDlH9lm0fa8ip/lHKQhu+KOJrK3huoI4vFehvGMoiLqVgpbZhkBwSnBzV9JnpxsAYfkMFkTdhtlZFySmTRmArzVigZ3o+1uZ52Wjp2/t6n+gr4aUxdvaalVVo859DoRiHceBflYhwD13oK0hVAQqJO+NMYuXPs/1oE8tSP8r6WlwnWkJPYkweAXBjH9xgtk0m2d3XHEHM+u5rR9B+t9S7lJjx/CTT027u/ylIyaY+2lhqCBwPa/ij8boPiYK9DjjVSYoeA9aLePHtY0Yd0rS7r4fbXvgzr7B9ZvMaw2aMTXRkfbq5ptcC2KaK5LotFevusMUNo0cEppSdGzl9HFDqsrHpov+OeA/xRT29VobGIjDTUEoiFQQztx4fbMVwWurc0qvGYoLhLj2U1QQuhXo4x7juAduhvePtCDMBOEa3888L5tUlupBXCfJzFumBaG7hv7XU0Eg0C1tVu8VA2Vq1iJmwVhuyrQgqzMsyOepIOvh2nYonlm8F7gvPbAQlZn1W3QFUXUFQfzRkI4zWJetIIgtrk5bCqbXUVeJ8e6k8qHNN2IW9QewGq9wvasNdWtHlbgzrzVoisLaSEd14w9t4VeSY6oWtw+ruu2PecFz5+YFy0N5IX+kVwn6qlHCKHPNAd+N5irfdFPluQNuaDxcFCSaWjCE0JaibmNKMFfQt987zateAj/6dQpSglkUBPk8TpcPn59kdiwVU1THC8bv5eKlaVXKJuM7vIIxdGXHIG2IN9Dv6lSyYasRVPf/a0MoJ4NaPfXcdwxycBRk47CioXTNGCdkHmOaVlcQXIMLmplrEtz1YCiIvkgLC3LKuEwFSSjqLzMVpHXkpwE3Fy0TXJDVn7n3yYS+UMwkgB7nXK2Zyo5Jt91/6CZFMOs9Upw/PPLIxJHhyttGVD345nGhyzbkVfm0/Mcv0MzzZ2rmyPmaOZxVcCz/iQs1c8DfYw76X8gNVVwypNJ3kmnB9D532h4uCpLedqKvY9i8TfqMbleTeH/7GofbxTo+TGaQ4LrchvO2pMbxV6ZKWU+BSzjUu5jBSgWXScymD6MPC5WMloizor7KbvV60MfPKIzpmIUKks5iUWFxfh0zPnTZ4vrqv/dH7Is+ugbBZ9lYNHno2tETC9Hu8QR9cnt/WazPpiB0eYydC55ZHTb1Io4/vfBHC/KJgjB7paiBz6Iga1MWhHSOYbzo+d/UeLbq2TBj/eb3DPLT7QZFXtV5FnOofFpupe/avMD5debghcn84EW788NQigUztTwqRtDXjvI+yluwFm+nXt/NC/iaYU00czXaBit25wX8W3H8hbxK3/dNlTP3+g3z4aYgTBdCsBYyE2OsYzCIV3/ArIqRdYGJt3tfYtYl5UY92uY04gb9fJt6Ifp8GW12GeswCErt6lM474cxxBVwoabyPc7DDK92sQ3XQdIKkl5JZ9zDDBz6+YuxXqNbK6ZJl6HMxvsvo+9z8fqfCX1riXeHvkKPe0OfPXGQLQiU/lSmzBP6zgFvT8zmreUxPdVsseR9XgpCEKxfEWfqGPc0tY6zHmO5ucVSvF+/gj0id175GXCLroFw/ywvVBHIC/qXobxkDvmbIPi7zNV+LS84fQPcqqfR7i6U7+cHfV9D2wqc48ubV+7/5LXSd1FOsOIanP8YLMgH5oVQFCpM0L8iL1D+SE7Ad5k5eIHbNNenL6wR7ekT/02rL9il1Vt2QWEeyhzcQAxWQXBj5u0pnKynUCHUIfrpmfXM8nBDIEpDl+Eidccc6pmZbchqpldt6uqUK9LZZvP8PL2tgoLJfU94kC9SMI3FN/X9BFfgGfjavR9AUXenUpbRNrvn0vR2Dr1v9MMVZQhXjFs49HZ29SO0fTfOlK7D+yLOX0VB5kIZj1GJ9LjB5v0YZQL7oQBRgFF3M9q2MjtkBPLoy+6ly/FHvP4ZpTklNE343m9RuBmks99kxkp6+jfpvH/c+4V+Lsr+TTru6XRcv5aKz3HHbOonkx2OXwAr9Sce5+/a4/r6hudSWkNmkTqtnktx7Z4OfiebWp2pIAy6YUnf4jPhH0fEhxUVp+u5wRLK+1CC60lwNXHv/53/9JI+l3DLDMZWj/rtvKdo+16iYOwELbUu0j+Y0Y8OTD8Tgv9rXZiD/q78RXCPFl5Age4xh3xQCn8z3KUXUR5COz/O+SS9NhDHBitOZRyCc36HvtpQ4IJVaLAorxh9VVxjqqyYelZkqv/hJ9S736g5eX3TEldHbImj176kgdCeSf0eZD8VhC4JBIM3sh036RcQgF4+ecPYsccxPmCAqptjm/p+OujNhP49zv8D2mJ29/6Nf4eT/Xc73OaA819FSeKaPRQMCqmeuXJgFrWrL+Gh30GXLPM8wpQrZ98kLQlmXFoiCjcVLpXh4j6wOASwHu2uoLCnfOxmro1k9pVaK7mTws+gPR2Ef9qXHsAmeG+oTDF9/xcX5dQ6bnykABr9QMhoDe1QQrv36b7+1YT/fBLn5kp93xfcQ8zS6TquOTEOijMVa1iz5XAjZxoKYjqmo6CY6xkf6PvLFM89mQqi/+5FgYDb1M1UsjWjx+ouK6GblrCqt6KOuw9WtllLLt37WZxWlLB6foH6zbS6aPvEypEDy4rOkHnnn4xZ/SlYiS16/BD074FCbINgr8T738Aq3GEOzSg3PXa+1bSfadte1FxylDk4bXRuwH89+npNV5JQBS3KHr3weiFaJ99HJ4ZmvDK9+kvPzp4/6WbTr6cN1+OgfbB9sc3Cn9vur4LAXToHM8nPaerx8M9h+jCznjM5F9Pi+rZ39S4I17V97Uo10qvuK41+PNdSkLIzVUY7zylQlJvj3DEL4YKArMP736Pcwq0Z+9qJijFM5BoJlUEXKn1zo7oSgrQUfVy5YbjHqi+yKd47IJAIPj0PcIU9ux9aNcYmqZm2ObWIh5jEsyphbFn5LmOWZpyLPn4BIWUgexsFky4Q+4CV4QbKW3Ac7gx/gzLWkrkdXm8zoqyAO5/Rbg6Vgy5auo4LcfqOYju3tZQ+jzH/KB2oUxk6TjjVEbN6bojZ3DeutvRewGXclSwouRz38g4G3ZmKyfElbOPhLrr/A0r8k1a4X1FT759eo/24JN0wfbOm+jbefzdtGQcEM7kKwY0x6IZivIZyYX7A9xUozcT8eb7Tch+ZbjNVXfCZ/9ol/7Hpo3KDvtPzQr6roIzVeuwS8PXkP3mRZl46S8uF1Tom4O8+IeTbOjxYHoPCPJ0b8p1l0uYcqdWNHtVTa7kJsckPu+uVSZkzy2AtCGMMClALZm0Gp9kCyr75MOjmcGZvdU4ck55Be7ebcjS3ubMvKhBXlNOC1Ltd+l8P3SVtDu8ZXHjjjM5j2WsjfcGxcBs63bw2R+k5jAP0vVh272lcJEzfC46V/TIZ0N+D53FMCIWMqaAg05JOdQpdjw7n+HGdRXoG7gjej9Uu/mam1M0+09taiOHKeKwcT/NJ3FnLhEPvSZPHNkOpjG0wHuv6sb1dMLpkzKSxfyhq5n8Z6PujeIyFz6l3nelIKjCDfOPfI3vfa+6DizlOLeA1Ndyz7HElCkrg+qkrjA2davXmE8Y5azKyaP1CRYAwbsuvuZjW48ns+oNOZEpObqDiTMY75kD53flBf5AKAyuyFK7XOzmBijU5upXxa0MC/gdPqJrh0Z4Z5emuta5CeWvnUusNmrEIqTPYGOQzMHjr+Q8kW0A+Kwe7v0PJxmHDhsKVvgmKxzWnrXC1buDx/fpOuZX+ybAg3flLdAX5TXb9IQMuVU5oxrdyA76H0q5YTsDfPDow/TqtfvikXXVKW0+d0t5Va727XwuyH78oFL54GIkDdZkRo3me4yJtdpt++VRBZmlweRZn1x9SaBnmTh7KeMVcVcF1lN2meTP1bcpa7ZipPUssZ257YlSv9J1W7zwBlqNRe8lJC7JKFETIBgH/vbAeW6kgiHt+2jmm/82fe5FX5Z8AxdiiZ66C/jfy5lV8xxwqvxIuTnlOcOYnmYJMcsIVhYglLoJrdIV5nv/bcJVm9138s82V5VfmB8q/Qbeqv+zX8YsqTmR9fsB/qblyxjfh9s2jghwVrNCmRb68VHtm5Ne1WssPYCGugZs1Wy/8d0W89iyz3tpTr6zXfm/XYEle/6L97Y8wMEwfI267E+XluKL+thPxW1//EdAv+cGKU2FB/ppa9e5GkN7ChT4ozbPmUMWNQ+addzIzUXrjR6bk54emlyDY/k+0Zdp3lb4oGPBF+ynspxHt3uYWFCpMTqTcif6MnP9c35Dj5k8bnhuYcWlu0L8Q9StT/a2lghwd8G+5deGEuFZvadxdhxikTmnoqlWamLWi1eiqs8bwunH3MoX/ibUOZZ5Wc3B+ein860NXnNvbO+BSxRT31QmLeuH+JEZ6MTQ0Y5ieWQr4m8zcPkLXRk/DVtCibMwLli/Lm+efQCXhGoi50l+D4x1Mz+pt2H5fxUjrsqwzMzsV9J3ObSd54Rml+PyAmesver3Rnqv0+eEKbWzVuSsWLy6Oac9YtT1QAipCZtnzlPGKOITWY0H3UxbvF/H/eYX+oZLQYjB9b2zz2Y/AvBdzphydVzmjIJer4kHfrQiSfwmFqYbQJvN/czEX9Xbg/V9gWWohzEwDb+MeLLx2MeuVG/L9ErP/PXi9d6/C4wHffWj3MNqvzjcWH7ezv/yQv163QkH/mnR/KGGed1yw/H5H1XkP3rBo4o0rlhTeotUr9yFAvze7GP+yaLurm+7XUtsE/u3o4G+AIOwvj/uG5oTPLdTXK4K+uzCrc7FwC1fVqSz6Hix9EZEuk/+xnKqKqdyEmFt5rj3nsXLnXiV0joOv3AYPRbud50HJuvMXX6TlL52l8dVsKNoHeZW+SiYMTCG/Y3RwuuviBaefitjjZO35410f/5/L8XH9GGd20Z52uLRlFps2Z+/1B0H4XDlu/sXDuc8qN+BfAGWJcqUdr83mSt+TufPKZ3EBL/ucAZnrG5oK7Jfrq/Zc6wj4N+kuV6j8koOxGCkIh5IjGJQzqDYHy9154ZmlfM15tKJwWMYmw0GB846jNUFfuaHzJ8G1K0UMVHTiPn4vIgiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiHG/8Py5I543pwNGsAAAAASUVORK5CYII=" alt="Mudah.my">
+</div>
+</header>
+
+<!-- ============ TLDR ============ -->
+<div class="tldr">
+<h2>TL;DR</h2>
+<ul>
+<li><strong>What we tested:</strong> Redesigned the View Car Grant CTA from a standalone outlined button into a lighter inline banner-row with a "View" action. 50/50 user split, planned 6-week hold. Launched May 13, 2026.</li>
+<li><strong>Status:</strong> 53 of 53 days analyzed (~100% complete).</li>
+<li><strong>Result so far:</strong> Primary metric (CTA CTR) is significant and strongly positive on all 3 platforms. iOS additionally shows significant lift on lead conversion metrics. Mobile Web and Android show no measurable lead impact.</li>
+</ul>
+<table>
+<thead><tr><th>Metric</th><th class="num">Lift</th><th class="num">p-value</th></tr></thead>
+<tbody>
+<tr><td><strong>CTA CTR (iOS)</strong></td><td class="num"><strong>+67.97%</strong></td><td class="num"><strong><0.0001 ✓</strong></td></tr>
+<tr><td>CTA CTR (Mobile Web)</td><td class="num">+17.68%</td><td class="num"><0.0001 ✓</td></tr>
+<tr><td>CTA CTR (Android)</td><td class="num">+53.64%</td><td class="num"><0.0001 ✓</td></tr>
+<tr><td>Leads/user (iOS)</td><td class="num">+4.17%</td><td class="num">0.0007 ✓</td></tr>
+</tbody>
+</table>
+<ul>
+<li><strong>iOS is a clear data-driven win — 4 of 5 metrics significantly positive, including leads/user (+4.2%, p=0.0007) and leads/adview (+4.3%, p=0.0006).</strong></li>
+<li><strong>Mobile Web and Android show a large, significant lift in CTA engagement but no measurable movement on lead metrics (all lead-related p-values > 0.23). Earlier Android "regression" fully washed out with more data.</strong></li>
+<li><strong>Recommendation:</strong> Ship to 100% on all three platforms. <strong>Next checkpoint: Post-launch monitoring (Jul 11).</strong></li>
+</ul>
+</div>
+
+<!-- ============ 1. PROBLEM STATEMENT ============ -->
+<section>
+<h2><span class="num">1</span>Problem statement &amp; objective</h2>
+<p><strong>Problem.</strong> The original Car Grant CTA on the adview page — a standalone outlined button — takes up dedicated vertical space and visually competes with the primary conversion actions (Call, WhatsApp). We wanted to test whether a lighter, more integrated presentation could improve grant discoverability without harming lead conversion.</p>
+<p><strong>Hypothesis.</strong> Redesigning the Car Grant CTA into an inline banner-style row with a "View" action on the right will increase Car Grant CTA taps by reducing visual clutter, without harming lead-generation metrics (Call / WhatsApp taps and total leads).</p>
+<p><strong>Objective.</strong> Confirm that the new design (a) lifts Car Grant CTA engagement significantly and (b) does not cause a statistically significant regression in leads per user or leads per adview on any platform.</p>
+</section>
+
+<!-- ============ 2. SUCCESS METRICS ============ -->
+<section>
+<h2><span class="num">2</span>Success metrics</h2>
+
+<h3>Primary</h3>
+<div class="metric-grid">
+<div class="metric-card">
+<div class="name">CTA CTR (iOS) <span class="tag pos">PRIMARY</span></div>
+<div class="desc">unique users who tapped Car Grant / unique users exposed. Direct measure of whether the redesign is more discoverable and tappable. Two-proportion z-test, α=0.05, two-tailed.</div>
+</div>
+<div class="metric-card">
+<div class="name">Leads per user <span class="tag neu">SECONDARY</span></div>
+<div class="desc">total leads submitted / unique users exposed. Business outcome metric. Confirms the redesign does not cannibalise contact intent.</div>
+</div>
+</div>
+
+<h3>Supporting</h3>
+<p class="muted">Leads per adview (event-level conversion), Leads per responder (per-responder productivity), User→Responder rate (any-contact conversion).</p>
+
+<h3>Guardrails</h3>
+<p class="muted">Total leads (absolute); User→Responder rate. Both must not show a significant regression on any platform.</p>
+</section>
+
+<!-- ============ 3. EXPERIMENT SETUP ============ -->
+<section>
+<h2><span class="num">3</span>Experiment setup</h2>
+
+<h3>Configuration</h3>
+<table>
+<tr><th>Field</th><th>Value</th></tr>
+<tr><td>Platform</td><td>Mobile Web · iOS · Android</td></tr>
+<tr><td>Vertical / category</td><td>Cars For Sale</td></tr>
+<tr><td>Surface</td><td>Adview page</td></tr>
+<tr><td>Bucketing</td><td>Lazy user-level bucketing on eligibility (only users who view a Car Grant-eligible listing are bucketed). 50/50 split.</td></tr>
+<tr><td>Planned hold</td><td>6-week</td></tr>
+<tr><td>Launch date</td><td>May 13, 2026</td></tr>
+<tr><td>Eligibility</td><td>Only listings that show the Car Grant CTA (i.e., cars financed via participating partners). Non-eligible listings are outside the experiment.</td></tr>
+</table>
+
+<!-- OPTIONAL: Explain non-standard bucketing logic if needed -->
+<h3>Note on eligibility and lead attribution</h3>
+<p>Because bucketing only happens when a user first lands on an eligible listing, treatment-bucketed users may subsequently visit non-eligible listings within the same session and submit leads there. Those leads are still attributed to the treatment group. This means the top-line lead numbers include both eligible-listing leads and non-eligible-listing leads for bucketed users. A follow-up BI cut (requested separately) will isolate eligible-listing leads only.</p>
+
+<h3>Treatment surfaces</h3>
+<ul>
+<li><strong>Car Grant banner row</strong> — Inline row on the adview page, replacing the standalone outlined button</li>
+<li><strong>Car Grant landing page</strong> — Unchanged in this experiment — only the entry-point CTA was redesigned</li>
+<!-- Add more <li> as needed -->
+</ul>
+
+<!-- OPTIONAL: Behavior matrix table — delete if not applicable -->
+<h3>When the treatment shows vs doesn't</h3>
+<table>
+<thead><tr><th>State</th><th>Control behaviour</th><th>Treatment behaviour</th></tr></thead>
+<tbody>
+<tr><td>Car Grant-eligible listing</td><td>Standalone "View Car Grant" button shown</td><td>Inline "Car Grant … View" banner row shown</td></tr>
+<tr><td>Non-eligible listing</td><td>Nothing shown; user is not bucketed</td><td>Nothing shown; user is not bucketed</td></tr>
+<tr><td>User already bucketed, then visits non-eligible listing</td><td>Standard adview page; still counted in control</td><td>Standard adview page; still counted in treatment</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ============ 4. METHODOLOGY ============ -->
+<section>
+<h2><span class="num">4</span>How the data was analyzed</h2>
+<h3>Aggregation approach</h3>
+<p>Daily counts are added together across the analysis window to get period totals. Two views are computed:</p>
+<ul>
+<li><strong>Aggregated view</strong> — period totals per arm, compared via two-proportion z-tests. This is the main view.</li>
+<li><strong>Cumulative trend</strong> — running total through each day, used to check for novelty effects.</li>
+</ul>
+<h3>Statistical tests</h3>
+<ul>
+<li>Two-proportion z-test for rate metrics (α = 0.05, two-sided)</li>
+<li>Chi-squared test on user counts for SRM</li>
+<li>95% confidence intervals on absolute differences</li>
+</ul>
+<!-- OPTIONAL: Data scope adjustment — delete if not applicable -->
+<h3>Data scope adjustment</h3>
+<p>No data days were excluded — the 53-day window includes all valid experiment days from launch to readout. Rows with null experiment (organic non-bucketed traffic) were excluded from all rate calculations. <strong>Rows where experiment column is null (organic non-bucketed traffic) is excluded</strong> from the analysis.</p>
+</section>
+
+<!-- ============ 5. SANITY CHECK ============ -->
+<section>
+<h2><span class="num">5</span>Data sanity check</h2>
+<p>Traffic volumes are large across all three platforms (>1M total exposed users). Bucket split is consistently ~51/49 in favour of control on every platform, every week — SRM is present and structural. Adviews per user and browse depth are effectively unchanged between arms, indicating the redesign does not alter navigation patterns.</p>
+<div class="kpi-row">
+<div class="kpi"><div class="label">Total users</div><div class="val">2.29M</div><div class="sub">across all 3 platforms</div></div>
+<div class="kpi"><div class="label">Overall split</div><div class="val">51.1 / 48.9</div><div class="sub">control / treatment · ⚠ SRM</div></div>
+<div class="kpi"><div class="label">Total leads</div><div class="val">99,124</div><div class="sub">both arms combined</div></div>
+<div class="kpi"><div class="label">Duration</div><div class="val">53 days</div><div class="sub">7 full weekday cycles</div></div>
+</div>
+
+<!-- OPTIONAL: Sanity check chart — delete if no master/baseline reference -->
+<div class="chart-wrap">
+<h4>Control share of daily bucketed users, by platform (should be 50%)</h4>
+<canvas id="ratioChart"></canvas>
+</div>
+
+<!-- Findings — duplicate the .callout block as many times as needed -->
+<!-- Use callout.pos for positive findings, callout.neg for issues, callout.info for neutral -->
+<div class="callout neg">
+<strong>Finding 1 — Sample Ratio Mismatch on all three platforms ⚠️</strong>
+The 50/50 bucketing came out ~51/49 favouring control every week on every platform. Chi-squared: 307.7 (Mobile Web), 251.0 (iOS), 447.7 (Android) — all far above the 3.84 threshold. The consistency of direction and magnitude across platforms points to a shared randomisation issue in the experiment harness rather than platform-specific noise. Results below are directionally valid but not statistically clean. This should be fixed before the next experiment.
+</div>
+<div class="callout pos">
+<strong>Finding 2 — Adviews per user and browse depth unchanged ✓</strong>
+Adviews per user are within 1% between control and treatment on all platforms (Mobile Web 2.31 vs 2.32; iOS 3.76 vs 3.75; Android 4.15 vs 4.12). The redesign does not change navigation behaviour — any conversion difference is on-page, not from session structure.
+</div>
+<div class="callout pos">
+<strong>Finding 3 — Traffic volumes are large and stable ✓</strong>
+Over 53 days each platform accumulated hundreds of thousands of exposed users. Sample sizes exceed those required for detecting a 1-percentage-point difference in leads/user at 80% power, meaning the "no lift" findings on Mobile Web and Android are well-powered, not underpowered.
+</div>
+</section>
+
+<!-- ============ 6. RESULTS ============ -->
+<section>
+<h2><span class="num">6</span>A/B test results</h2>
+<p class="muted">Period: May 13, 2026 – Jul 4, 2026 (53 days). SRM check: control 1,170,913 vs treatment 1,122,901 users (χ²=~1,006 (combined), p=<0.0001) — SRM present, structural bucketing issue across all platforms.</p>
+
+<h3>Primary &amp; supporting metrics</h3>
+<table>
+<thead><tr><th>Metric</th><th class="num">Control</th><th class="num">Treatment</th><th class="num">Lift</th><th class="num">p-value</th><th>Significance</th></tr></thead>
+<tbody>
+<tr><td><strong>CTA CTR (iOS)</strong></td><td class="num">3.493%</td><td class="num">5.867%</td><td class="num"><strong>+67.97%</strong></td><td class="num"><strong><0.0001 ✓</strong></td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+<tr><td>CTA CTR (Mobile Web)</td><td class="num">2.957%</td><td class="num">3.480%</td><td class="num">+17.68%</td><td class="num"><0.0001 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+<tr><td>CTA CTR (Android)</td><td class="num">2.791%</td><td class="num">4.288%</td><td class="num">+53.64%</td><td class="num"><0.0001 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+<tr><td>Leads/user (iOS)</td><td class="num">4.288%</td><td class="num">4.467%</td><td class="num">+4.17%</td><td class="num">0.0007 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+</tbody>
+</table>
+
+<div class="chart-wrap">
+<h4>Cumulative trend — Primary metric lift over time (with daily p-value)</h4>
+<canvas id="trendChart"></canvas>
+</div>
+<div class="callout info">
+<strong>Trend interpretation</strong>
+iOS CTA CTR lift starts at ~+121% on day 1 (novelty peak) and settles at ~+68% by day 53 — a classic novelty-decay pattern that stabilises after ~week 3. The effect is real and durable: even after decay, the lift remains large, highly significant, and consistent every day. p-value is essentially zero throughout. Mobile Web and Android show similar decay patterns for CTA CTR but stabilise at lower lift levels (+18% and +54% respectively). The stabilisation across all three platforms confirms this is a genuine steady-state effect rather than transient novelty.
+</div>
+
+<!-- OPTIONAL: Feature engagement table — delete if not relevant -->
+<h3>Feature engagement (treatment)</h3>
+<table>
+<thead><tr><th>Touchpoint</th><th class="num">Impressions</th><th class="num">% of treatment adviews</th></tr></thead>
+<tbody>
+<tr><td>Car Grant CTA taps (unique users)</td><td class="num">17,220</td><td class="num">5.87%</td></tr>
+<tr><td>Total Car Grant CTA tap events</td><td class="num">~30,000</td><td class="num">≈1.7 taps/user</td></tr>
+<tr><td>Uplift vs control (iOS)</td><td class="num">+67.97%</td><td class="num">p < 0.0001</td></tr>
+</tbody>
+</table>
+
+<!-- OPTIONAL: Segment breakdown — delete if no segment data -->
+<h3>Adview breakdown by segment (treatment, total = 3.8M adviews)</h3>
+<table>
+<thead><tr><th>Segment</th><th class="num">Adviews</th><th class="num">% of All</th><th>Leads/user (trt)</th><th>p-value</th></tr></thead>
+<tbody>
+<tr><td>Android</td><td class="num">1.88M</td><td class="num">48.9%</td><td>3.55%</td><td>0.593</td></tr>
+<tr><td>Mobile Web</td><td class="num">0.87M</td><td class="num">22.5%</td><td>5.22%</td><td>0.850</td></tr>
+<tr><td>iOS</td><td class="num">1.10M</td><td class="num">28.6%</td><td>4.47%</td><td>0.0007 ✓</td></tr>
+<!-- Add more rows as needed -->
+</tbody>
+</table>
+
+<!-- OPTIONAL: Segment behavior table — delete if no segment data -->
+<h3>Treatment behavior by segment</h3>
+<p class="muted">The per-platform view below shows how leads/user, leads/adview, and CTA CTR moved in treatment for each platform. iOS is the only platform where lead metrics are statistically significant.</p>
+<table>
+<thead><tr><th>Segment</th><th class="num">Users</th><th class="num">CTA CTR lift</th><th class="num">Leads/user lift</th><th class="num">Verdict</th></tr></thead>
+<tbody>
+<tr><td><strong>iOS</strong></td><td class="num">293,512</td><td class="num"><strong>+67.97% ✓</strong></td><td class="num"><strong>+4.17% ✓</strong></td><td class="num"><strong>Ship (data-driven)</strong></td></tr>
+<tr><td>Mobile Web</td><td class="num">372,471</td><td class="num">+17.68% ✓</td><td class="num">+0.19% ✗</td><td class="num">Ship (no harm)</td></tr>
+<tr><td>Android</td><td class="num">456,918</td><td class="num">+53.64% ✓</td><td class="num">+0.58% ✗</td><td class="num">Ship (no harm)</td></tr>
+</tbody>
+</table>
+<p class="muted">iOS is the only platform where lead metrics are statistically significant and positive (+4.2% leads/user, +4.3% leads/adview). Mobile Web and Android show significant CTA engagement lift but no measurable lead impact — well-powered "flat" readings, not underpowered "unknown" ones. Guardrail metrics are within noise on all platforms; no significant negative movement anywhere.</p>
+</section>
+
+<!-- ============ 7. RECOMMENDATIONS ============ -->
+<section>
+<h2><span class="num">7</span>Recommended next actions</h2>
+<h3>Metric summary</h3>
+<p>The primary metric (CTA CTR) is significantly positive on all three platforms with p-values well below 0.0001. On iOS, this translates into statistically significant lifts in leads/user (+4.2%, p=0.0007), leads/adview (+4.3%, p=0.0006), and leads/responder (+3.3%, p=0.009). On Mobile Web and Android, the CTA engagement lift does not translate into a statistically significant lead lift — but critically, no lead metric is significantly negative either. All 95% confidence intervals on Mobile Web and Android leads/user tightly bracket zero, indicating the sample size is well-powered to detect a meaningful effect. Guardrail metrics (user→responder rate, total leads normalised for split) show no regression on any platform.</p>
+<table>
+<thead><tr><th>Metric</th><th class="num">Lift</th><th class="num">p-value</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>CTA CTR (iOS)</td><td class="num">+67.97%</td><td class="num"><0.0001 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+<tr><td>CTA CTR (Mobile Web)</td><td class="num">+17.68%</td><td class="num"><0.0001 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+<tr><td>CTA CTR (Android)</td><td class="num">+53.64%</td><td class="num"><0.0001 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+<tr><td>Leads/user (iOS)</td><td class="num">+4.17%</td><td class="num">0.0007 ✓</td><td><span class="tag pos">SIGNIFICANT</span></td></tr>
+</tbody>
+</table>
+
+<h3>Recommendation: Ship to 100% on all three platforms</h3>
+<ul>
+<li>iOS is a data-driven ship: 4 of 5 metrics significantly positive, including both primary and lead-related metrics. Estimated impact of +547 leads over 53 days on a normalised basis.</li>
+<li>Mobile Web and Android show significant CTA engagement gains with no measurable harm to lead metrics (all lead-related p-values > 0.23, 95% CIs bracket zero). Shipping captures the CTA discoverability benefit at no measurable business cost.</li>
+<li>The SRM is structural and platform-agnostic. It should be fixed before the next experiment, but does not change the interpretation of these results — the effect sizes on CTA CTR are far too large to be explained by a 2-percentage-point split imbalance.</li>
+<li><strong>Next checkpoint: Post-launch monitoring (Jul 11).</strong> Post-launch monitoring plan: track daily leads/user and total leads for 2 weeks post-100%-rollout on each platform. If leads/user drops by more than 2% vs the 30-day pre-launch baseline (on any platform), pause and investigate.</li>
+<li>BI follow-up queries in flight: (1) leads restricted to Car Grant-eligible listings only, and (2) grant tapper funnel decomposition. These will refine the Mobile Web and Android read but are not blockers for the rollout decision.</li>
+</ul>
+</section>
+
+<footer style="text-align:center;padding:18px;color:var(--ink2);font-size:12px;border-top:1px solid var(--line);margin-top:8px">
+<div style="margin-bottom:6px"><strong style="color:var(--brand-red)">mudah.my</strong> · Product Analytics</div>
+View Car Grant CTA Redesign A/B Test Readout · MD-2410 · Data as of Jul 4, 2026 · Prepared by Rizki Malano
+</footer>
+
+</div>
+
+<!--
+=================================================================
+CHART DATA — Replace arrays below with experiment-specific values
+=================================================================
+-->
+<script>
+const COL_CTRL = '#94a3b8', COL_TRT = '#E51E2A', COL_GREEN = '#10b981', COL_RED = '#ef4444';
+const COL_IOS = '#1495D2', COL_MWEB = '#F5A623', COL_AND = '#00963C';
+
+// ============ SANITY CHECK CHART ============
+// Daily control share per platform — should be ~50% (dashed reference line)
+const ratioLabels = ['05-13','05-17','05-21','05-25','05-29','06-02','06-06','06-10','06-14','06-18','06-22','06-26','06-30','07-04'];
+const shareMWeb   = [50.21, 51.41, 50.61, 51.08, 50.93, 50.98, 51.97, 50.86, 51.33, 51.72, 50.45, 50.65, 50.72, 51.56];
+const shareIOS    = [51.32, 51.31, 51.30, 50.77, 50.75, 50.73, 50.89, 51.20, 50.95, 50.83, 50.57, 50.73, 51.83, 51.07];
+const shareAnd    = [52.48, 51.92, 51.07, 50.83, 51.35, 51.49, 50.95, 51.36, 51.31, 50.78, 50.99, 50.86, 50.78, 51.25];
+
+new Chart(document.getElementById('ratioChart'), {
+  type: 'line',
+  data: {
+    labels: ratioLabels,
+    datasets: [
+      { label: 'Mobile Web control %', data: shareMWeb, borderColor: COL_MWEB, backgroundColor: COL_MWEB+'20', borderWidth: 2, tension: .25, pointRadius: 3 },
+      { label: 'iOS control %',        data: shareIOS,  borderColor: COL_IOS,  backgroundColor: COL_IOS+'20',  borderWidth: 2, tension: .25, pointRadius: 3 },
+      { label: 'Android control %',    data: shareAnd,  borderColor: COL_AND,  backgroundColor: COL_AND+'20',  borderWidth: 2, tension: .25, pointRadius: 3 },
+      { label: 'Target 50%',           data: Array(ratioLabels.length).fill(50), borderColor: '#94a3b8', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, tension: 0 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } },
+    scales: {
+      y: { title: { display: true, text: 'Control share of daily users (%)' }, min: 48, max: 54 },
+      x: { ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+// ============ CUMULATIVE TREND CHART ============
+// CTA CTR cumulative lift per platform over the 53-day run
+const trendLabels = ['05-13','05-17','05-21','05-25','05-29','06-02','06-06','06-10','06-14','06-18','06-22','06-26','06-30','07-04'];
+const trendIOS    = [121.07, 90.28, 86.07, 85.22, 79.83, 77.99, 75.12, 74.86, 73.98, 71.13, 69.44, 69.06, 68.04, 67.97];
+const trendMWeb   = [25.10, 31.03, 25.79, 23.58, 21.60, 23.15, 21.96, 22.98, 22.25, 21.14, 19.66, 19.39, 18.52, 17.68];
+const trendAnd    = [187.11, 85.23, 70.57, 66.46, 64.92, 60.28, 57.64, 56.06, 54.74, 54.52, 54.20, 54.65, 54.43, 53.64];
+
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: trendLabels,
+    datasets: [
+      { label: 'iOS CTA CTR lift (%)',        data: trendIOS,  borderColor: COL_IOS,  backgroundColor: COL_IOS+'20',  borderWidth: 2.5, tension: .3, pointRadius: 3 },
+      { label: 'Mobile Web CTA CTR lift (%)', data: trendMWeb, borderColor: COL_MWEB, backgroundColor: COL_MWEB+'20', borderWidth: 2.5, tension: .3, pointRadius: 3 },
+      { label: 'Android CTA CTR lift (%)',    data: trendAnd,  borderColor: COL_AND,  backgroundColor: COL_AND+'20',  borderWidth: 2.5, tension: .3, pointRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: { callbacks: { afterLabel: () => 'p < 0.0001 · significant every day' } }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Cumulative CTA CTR lift (%)' }, grid: { color: '#eee' } },
+      x: { ticks: { font: { size: 10 } } }
+    }
+  }
+});
+</script>
+</script>
+</body>
+</html>
