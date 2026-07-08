@@ -55,6 +55,15 @@
   .kpi .d{font-size:12px;margin-top:2px}
   .foot{font-size:12px;color:var(--muted);margin-top:6px}
   ul{margin:8px 0 8px 2px;padding-left:18px} li{margin:4px 0}
+
+  details.methodology{margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fbfcfd}
+  details.methodology summary{cursor:pointer;padding:11px 16px;font-weight:600;color:var(--info);font-size:14px;list-style:none}
+  details.methodology summary::-webkit-details-marker{display:none}
+  details.methodology summary:before{content:"\25B8 ";color:var(--info)}
+  details.methodology[open] summary:before{content:"\25BE "}
+  .method-body{padding:2px 18px 14px;font-size:13.5px;color:var(--ink)}
+  .method-body p{margin:8px 0}
+  .calc{background:#eef2f7;border-radius:6px;padding:8px 12px;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -87,7 +96,7 @@
           <tr><td>SRM (split health)</td><td>49.67% · p=0.0005 <span class="tag t-warn">flag</span></td><td>50.11% · p=0.21 <span class="tag t-pos">ok</span></td></tr>
           <tr><td>% leads via gallery CTA</td><td>7.2%</td><td>21.7%</td></tr>
           <tr><td>Net incremental leads</td><td>+740 (~81% net-new)</td><td>+2,226 (~62% net-new)</td></tr>
-          <tr><td>Other-path cannibalization</td><td>−1.4% <span class="tag t-gray">not sig</span></td><td>−9.6% <span class="tag t-neg">sig</span></td></tr>
+          
           <tr><td>Gallery open rate (guardrail)</td><td>flat · p=0.18 <span class="tag t-pos">ok</span></td><td>flat · p=0.98 <span class="tag t-pos">ok</span></td></tr>
           <tr><td>Trend</td><td>stable ~+11–12%</td><td>stable ~+13.5%</td></tr>
         </tbody>
@@ -98,13 +107,7 @@
       <h2>Recommendation</h2>
       <p>Positive read on both platforms. Mobile Web is the stronger and cleaner result (bigger lead lift, no SRM). Android is also a clear win but carries a minor SRM flag to resolve. Both show durable, non-decaying trends and clean gallery guardrails.</p>
       <div class="callout c-info">
-        <b>Next steps:</b>
-        <ul>
-          <li>Continue monitoring <b>both platforms ~2 more weeks</b> to confirm the lift holds.</li>
-          <li>Resolve the <b>Android SRM</b> (p=0.0005) with data/eng — confirm the ~0.3pp treatment shortfall is expected bucketing, not a filter bug.</li>
-          <li>Lock the <b>metric definition</b> (the <code>leads_gallery_openers</code> field changed between pulls).</li>
-        </ul>
-        <b>Target checkpoint: ~19 July 2026.</b>
+        <b>Next steps:</b> Continue monitoring <b>both platforms for ~2 more weeks</b> to confirm the lift holds before the final ship call. <b>Target checkpoint: ~19 July 2026.</b>
       </div>
     </div>
   </section>
@@ -181,17 +184,25 @@
         <div class="kpi"><div class="lbl">Net-new share</div><div class="val" style="color:var(--pos)">~81%</div><div class="d">genuinely incremental</div></div>
       </div>
       <div class="callout c-pos"><b>Predominantly incremental.</b> Total leads rose to 12,773 vs ~12,033 expected at the control rate. Non-gallery-CTA leads per user were nearly unchanged (−1.4%, not significant, p=0.24) — other contact paths were not meaningfully cannibalized. ~4 of every 5 gallery-CTA leads are net-new demand.</div>
+      <details class="methodology">
+        <summary>How is incrementality calculated? (methodology)</summary>
+        <div class="method-body">
+          <p>The gallery CTA is a <em>new</em> place to submit a lead, so leads flowing through it aren't automatically new demand — some users would have contacted the seller anyway via Chat/Call/WhatsApp and simply used the new button instead. Incrementality separates <b>net-new</b> leads from <b>shifted</b> ones. We use two cross-checking methods plus a confirmation test.</p>
+          <p><b>Method 1 — Expected vs actual (counterfactual).</b> Control gives the natural lead rate with no feature: 8.81% leads per user. If treatment behaved the same, it would produce that rate across its 136,553 users → <b>~12,033 expected leads</b>. Treatment actually produced <b>12,773</b>. The difference is the net gain the feature caused:</p>
+          <p class="calc">12,773 − 12,033 = <b>+740 incremental leads</b></p>
+          <p>This is measured on <em>total</em> leads, so it already nets out any shifting.</p>
+          <p><b>Method 2 — Compare to CTA volume (split new vs shifted).</b> The data shows <b>914 leads</b> came through the gallery CTA. If all were brand-new, total leads would have risen by the full 914. They only rose by 740, so the gap is leads that used the CTA <em>instead of</em> a path they'd have used anyway:</p>
+          <p class="calc">914 − 740 = <b>~174 shifted</b> &nbsp;→&nbsp; net-new share ≈ <b>81%</b></p>
+          <p><b>Confirmation — did other paths actually drop?</b> If leads were pulled from other channels, non-CTA leads should fall. Stripping out CTA leads: non-CTA leads/user = 8.69% (treatment) vs 8.81% (control) = <b>−1.4%</b>, <b>not statistically significant</b>.</p>
+          <p class="foot">Note: this assumes control's lead rate is a valid counterfactual, i.e. the arms are comparable. We normalise by <em>rate per user</em> (not raw counts) so any small headcount imbalance between arms doesn't distort the math.</p>
+        </div>
+      </details>
     </div>
 
     <div class="card">
       <h2><span class="sec-num">7</span>Recommended next actions</h2>
       <p>Positive early read — all success metrics significant and aligned, guardrails clean, lead growth genuinely incremental.</p>
-      <ul>
-        <li><b>Monitor Android ~2 more weeks</b> to confirm the ~+11% cumulative lift stays stable.</li>
-        <li><b>Resolve the SRM</b> (p=0.0005) with data/eng.</li>
-        <li><b>Lock the metric definition</b> with the data team.</li>
-      </ul>
-      <p><b>Next checkpoint:</b> re-pull ~19 July; re-run primary + leads + incrementality; make the ship call.</p>
+      <p><b>Next step:</b> continue monitoring Android for ~2 more weeks to confirm the ~+11% cumulative lift stays stable, then make the ship call. <b>Next checkpoint: ~19 July 2026.</b></p>
     </div>
   </section>
 
@@ -266,17 +277,25 @@
         <div class="kpi"><div class="lbl">Net-new share</div><div class="val" style="color:var(--pos)">~62%</div><div class="d">genuinely incremental</div></div>
       </div>
       <div class="callout c-warn"><b>Net-positive, but more shifting than Android.</b> Total leads rose to 16,602 vs ~14,376 expected. The CTA captured 3,600 leads while the net gain was +2,226, implying ~1,374 shifted from other paths. Non-gallery-CTA leads per user dropped <b>−9.6% (significant, p&lt;0.0001)</b> — other contact paths <em>were</em> meaningfully cannibalized. Still ~6 of 10 gallery-CTA leads are net-new.</div>
+      <details class="methodology">
+        <summary>How is incrementality calculated? (methodology)</summary>
+        <div class="method-body">
+          <p>The gallery CTA is a <em>new</em> place to submit a lead, so leads flowing through it aren't automatically new demand — some users would have contacted the seller anyway via Chat/Call/WhatsApp and simply used the new button instead. Incrementality separates <b>net-new</b> leads from <b>shifted</b> ones. We use two cross-checking methods plus a confirmation test.</p>
+          <p><b>Method 1 — Expected vs actual (counterfactual).</b> Control gives the natural lead rate with no feature: 8.30% leads per user. If treatment behaved the same, it would produce that rate across its 173,213 users → <b>~14,376 expected leads</b>. Treatment actually produced <b>16,602</b>. The difference is the net gain the feature caused:</p>
+          <p class="calc">16,602 − 14,376 = <b>+2,226 incremental leads</b></p>
+          <p>This is measured on <em>total</em> leads, so it already nets out any shifting.</p>
+          <p><b>Method 2 — Compare to CTA volume (split new vs shifted).</b> The data shows <b>3,600 leads</b> came through the gallery CTA. If all were brand-new, total leads would have risen by the full 3,600. They only rose by 2,226, so the gap is leads that used the CTA <em>instead of</em> a path they'd have used anyway:</p>
+          <p class="calc">3,600 − 2,226 = <b>~1,374 shifted</b> &nbsp;→&nbsp; net-new share ≈ <b>62%</b></p>
+          <p><b>Confirmation — did other paths actually drop?</b> If leads were pulled from other channels, non-CTA leads should fall. Stripping out CTA leads: non-CTA leads/user = 7.51% (treatment) vs 8.30% (control) = <b>−9.6%</b>, <b>statistically significant</b>.</p>
+          <p class="foot">Note: this assumes control's lead rate is a valid counterfactual, i.e. the arms are comparable. We normalise by <em>rate per user</em> (not raw counts) so any small headcount imbalance between arms doesn't distort the math.</p>
+        </div>
+      </details>
     </div>
 
     <div class="card">
       <h2><span class="sec-num">7</span>Recommended next actions</h2>
       <p>Strongest and cleanest result of the two — significant across all metrics, no SRM issue, durable trend.</p>
-      <ul>
-        <li><b>Monitor ~2 more weeks</b> to confirm durability.</li>
-        <li><b>Note the cannibalization</b> (−9.6% on other paths) explicitly in the final readout.</li>
-        <li>No SRM issue to resolve.</li>
-      </ul>
-      <p><b>Next checkpoint:</b> ~19 July 2026.</p>
+      <p><b>Next step:</b> continue monitoring Mobile Web for ~2 more weeks to confirm durability, then make the ship call. <b>Next checkpoint: ~19 July 2026.</b></p>
     </div>
   </section>
 
